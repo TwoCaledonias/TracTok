@@ -189,23 +189,35 @@ This is currently a private project. For development questions, refer to:
 
 ## 📈 Current Status
 
-**Phase**: 0 - Project Setup ✅
+**Phase**: 1 - Core Infrastructure (In Progress)
 
-### Completed
+### Phase 0 - Project Setup ✅
 
 - ✅ Next.js 14 with TypeScript (strict mode)
-- ✅ Tailwind CSS configured
+- ✅ Tailwind CSS v4 configured
 - ✅ Testing framework (Vitest + Playwright)
 - ✅ Git hooks (Husky + lint-staged)
 - ✅ Project structure established
-- ✅ First test passing
+- ✅ All core dependencies installed
+
+### Phase 1 - Core Infrastructure (Current)
+
+- ✅ Prisma schema designed with all models
+- ✅ Supabase Auth integration
+- ✅ Protected routes with middleware
+- ✅ Registration and login flows
+- ✅ shadcn/ui installed with warm orange theme
+- ✅ Dashboard with navigation
+- ✅ Landing page with features
+- ⏳ Database migration (requires Supabase setup)
+- ⏳ Vercel deployment (requires environment config)
 
 ### Next Steps
 
-- Phase 1: Core Infrastructure (Auth, Database, UI)
+- Complete Phase 1: Set up Supabase and deploy to Vercel
 - Phase 2: TikTok OAuth Integration
 - Phase 3: Order Tracking
-- See [plan.md](../plan.md) for full roadmap
+- See [plan.md](../planning%20docs/plan.md) and [PHASE1_SETUP.md](./PHASE1_SETUP.md) for details
 
 ## 📄 License
 

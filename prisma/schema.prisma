@@ -1,0 +1,246 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// User and Authentication Models
+// ============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Subscription info
+  subscriptionTier       SubscriptionTier @default(FREE_TRIAL)
+  subscriptionStatus     SubscriptionStatus @default(TRIALING)
+  freeTrialStartDate     DateTime?
+  freeTrialEndDate       DateTime?
+  subscriptionStartDate  DateTime?
+  subscriptionEndDate    DateTime?
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  maxAccounts            Int       @default(1)
+  dataRetentionMonths    Int       @default(6)
+
+  // Relations
+  tiktokAccounts TikTokAccount[]
+  orders         Order[]
+  dailyRevenue   DailyRevenue[]
+  withdrawals    Withdrawal[]
+  rewards        Reward[]
+
+  @@index([email])
+  @@index([stripeCustomerId])
+  @@map("users")
+}
+
+enum SubscriptionTier {
+  FREE_TRIAL
+  ONE_ACCOUNT
+  THREE_ACCOUNTS
+  FIVE_ACCOUNTS
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  UNPAID
+}
+
+// ============================================================================
+// TikTok Account Models
+// ============================================================================
+
+model TikTokAccount {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // TikTok account info
+  tiktokUserId       String   @unique
+  tiktokUsername     String
+  tiktokDisplayName  String?
+  
+  // OAuth tokens (encrypted in production)
+  accessToken        String
+  refreshToken       String?
+  tokenExpiresAt     DateTime?
+  
+  // Metadata
+  isActive           Boolean  @default(true)
+  lastSyncedAt       DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  orders         Order[]
+  dailyRevenue   DailyRevenue[]
+  withdrawals    Withdrawal[]
+  rewards        Reward[]
+
+  @@index([userId])
+  @@index([tiktokUserId])
+  @@map("tiktok_accounts")
+}
+
+// ============================================================================
+// Order Tracking Models
+// ============================================================================
+
+model Order {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tiktokAccountId String
+  tiktokAccount   TikTokAccount @relation(fields: [tiktokAccountId], references: [id], onDelete: Cascade)
+
+  // Order identifiers
+  orderId            String   @unique // TikTok order ID
+  
+  // Order details
+  dateOrdered        DateTime
+  productName        String
+  productPrice       Decimal  @db.Decimal(10, 2)
+  unitsSold          Int      @default(1)
+  
+  // Commission details
+  commissionRate     Decimal  @db.Decimal(5, 2) // Percentage
+  commissionBase     Decimal  @db.Decimal(10, 2) // Amount commission is calculated on
+  estimatedCommission Decimal @db.Decimal(10, 2)
+  actualCommission   Decimal? @db.Decimal(10, 2) // Null until settled
+  
+  // Status tracking
+  status             OrderStatus
+  statusDate         DateTime? // Date of last status change
+  deliveryDate       DateTime?
+  settlementDate     DateTime? // Date commission was settled
+  
+  // Daily revenue reference
+  dailyRevenueId     String?
+  dailyRevenue       DailyRevenue? @relation(fields: [dailyRevenueId], references: [id])
+  dateInDailyRevenue DateTime? // The date this order appears in daily revenue
+  
+  // Flags and metadata
+  isSettlementDelayed Boolean @default(false) // True if not settled within 30 days of delivery
+  rawData            Json? // Store raw API response for debugging
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tiktokAccountId])
+  @@index([orderId])
+  @@index([dateOrdered])
+  @@index([status])
+  @@index([deliveryDate])
+  @@index([settlementDate])
+  @@map("orders")
+}
+
+enum OrderStatus {
+  CREATED
+  PAID
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELED
+  RETURNED
+  SETTLED
+}
+
+// ============================================================================
+// Earnings Models
+// ============================================================================
+
+model DailyRevenue {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tiktokAccountId String
+  tiktokAccount   TikTokAccount @relation(fields: [tiktokAccountId], references: [id], onDelete: Cascade)
+
+  date              DateTime @db.Date
+  totalAmount       Decimal  @db.Decimal(10, 2)
+  orderCount        Int      @default(0)
+  
+  // Relations
+  orders            Order[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([tiktokAccountId, date])
+  @@index([userId])
+  @@index([tiktokAccountId])
+  @@index([date])
+  @@map("daily_revenue")
+}
+
+model Withdrawal {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tiktokAccountId String
+  tiktokAccount   TikTokAccount @relation(fields: [tiktokAccountId], references: [id], onDelete: Cascade)
+
+  withdrawalId      String   @unique // TikTok withdrawal ID
+  date              DateTime
+  time              String? // Time of withdrawal
+  totalAmount       Decimal  @db.Decimal(10, 2)
+  serviceFee        Decimal  @db.Decimal(10, 2)
+  actualAmount      Decimal  @db.Decimal(10, 2) // totalAmount - serviceFee
+  
+  rawData           Json? // Store raw API response
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tiktokAccountId])
+  @@index([date])
+  @@map("withdrawals")
+}
+
+model Reward {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tiktokAccountId String
+  tiktokAccount   TikTokAccount @relation(fields: [tiktokAccountId], references: [id], onDelete: Cascade)
+
+  rewardId          String   @unique // TikTok reward ID
+  dateOfReward      DateTime
+  rewardAmount      Decimal  @db.Decimal(10, 2)
+  source            String? // Source/reason for reward
+  datePaid          DateTime?
+  
+  rawData           Json? // Store raw API response
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tiktokAccountId])
+  @@index([dateOfReward])
+  @@map("rewards")
+}
+

@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm Orange Color Theme */
+  --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+
+  /* Primary: Warm Orange (#FF6B35) */
+  --primary: 14 100% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary: Warm Coral/Red (#F7931E) */
+  --secondary: 32 93% 55%;
+  --secondary-foreground: 20 14.3% 4.1%;
+
+  /* Accent: Warm Yellow (#FFC947) */
+  --accent: 42 100% 64%;
+  --accent-foreground: 20 14.3% 4.1%;
+
+  /* Muted with warm tone */
+  --muted: 30 40% 96%;
+  --muted-foreground: 25 5.3% 44.7%;
+
+  /* Destructive (muted red) */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Border and input with warm tone */
+  --border: 30 30% 90%;
+  --input: 30 30% 88%;
+  --ring: 14 100% 60%;
+
+  /* Radius */
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 20 14.3% 4.1%;
+  --foreground: 30 40% 98%;
+  --card: 24 9.8% 10%;
+  --card-foreground: 30 40% 98%;
+  --popover: 20 14.3% 4.1%;
+  --popover-foreground: 30 40% 98%;
+
+  --primary: 14 100% 60%;
+  --primary-foreground: 20 14.3% 4.1%;
+
+  --secondary: 32 93% 55%;
+  --secondary-foreground: 30 40% 98%;
+
+  --accent: 42 100% 64%;
+  --accent-foreground: 20 14.3% 4.1%;
+
+  --muted: 12 6.5% 15.1%;
+  --muted-foreground: 24 5.4% 63.9%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 12 6.5% 15.1%;
+  --input: 12 6.5% 15.1%;
+  --ring: 14 100% 60%;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: hsl(var(--border));
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
 }
