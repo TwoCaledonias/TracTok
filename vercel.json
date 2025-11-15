@@ -1,7 +1,0 @@
-{
-  "buildCommand": "cd tractok && pnpm build",
-  "devCommand": "cd tractok && pnpm dev",
-  "installCommand": "cd tractok && pnpm install",
-  "framework": "nextjs",
-  "outputDirectory": "tractok/.next"
-}
