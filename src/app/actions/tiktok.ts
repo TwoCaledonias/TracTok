@@ -76,8 +76,8 @@ export async function getAccountConnectionLimits() {
   }
 
   try {
-    console.log("🔍 Fetching limits for user:", session.user.id);
-    const limits = await getAccountLimits(session.user.id);
+    console.log("🔍 Fetching limits for user:", session.user.id, session.user.email);
+    const limits = await getAccountLimits(session.user.id, session.user.email);
     console.log("✅ Limits fetched successfully:", limits);
     return { success: true, limits };
   } catch (error) {

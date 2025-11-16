@@ -198,7 +198,10 @@ export async function canConnectMoreAccounts(userId: string): Promise<boolean> {
 /**
  * Get account count and limit for a user
  */
-export async function getAccountLimits(userId: string): Promise<{
+export async function getAccountLimits(
+  userId: string,
+  userEmail?: string
+): Promise<{
   current: number;
   max: number;
   canConnect: boolean;
@@ -217,25 +220,34 @@ export async function getAccountLimits(userId: string): Promise<{
   // If user doesn't exist in database, create them with default values
   if (!user) {
     console.log(`Creating user record for ${userId}`);
-    user = await prisma.user.create({
-      data: {
-        id: userId,
-        email: "user@example.com", // Will be updated on next login
-        subscriptionTier: "FREE_TRIAL",
-        subscriptionStatus: "TRIALING",
-        maxAccounts: 1,
-        dataRetentionMonths: 6,
-        freeTrialStartDate: new Date(),
-        freeTrialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      },
-      include: {
-        tiktokAccounts: {
-          where: {
-            isActive: true,
+    // Use actual email or generate a unique placeholder
+    const email = userEmail || `user-${userId}@tractok.temp`;
+
+    try {
+      user = await prisma.user.create({
+        data: {
+          id: userId,
+          email: email,
+          subscriptionTier: "FREE_TRIAL",
+          subscriptionStatus: "TRIALING",
+          maxAccounts: 1,
+          dataRetentionMonths: 6,
+          freeTrialStartDate: new Date(),
+          freeTrialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        },
+        include: {
+          tiktokAccounts: {
+            where: {
+              isActive: true,
+            },
           },
         },
-      },
-    });
+      });
+      console.log(`✅ User record created successfully`);
+    } catch (error) {
+      console.error(`❌ Failed to create user record:`, error);
+      throw error;
+    }
   }
 
   const current = user.tiktokAccounts.length;
