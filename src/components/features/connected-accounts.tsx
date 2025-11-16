@@ -43,9 +43,14 @@ export function ConnectedAccounts() {
   }, []);
 
   const loadLimits = React.useCallback(async () => {
+    console.log("🔍 Loading account limits...");
     const result = await getAccountConnectionLimits();
+    console.log("📊 Limits result:", result);
     if (result.success && result.limits) {
+      console.log("✅ Setting limits:", result.limits);
       setLimits(result.limits);
+    } else {
+      console.error("❌ Failed to load limits:", result);
     }
   }, []);
 
