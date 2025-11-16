@@ -206,7 +206,7 @@ export async function getAccountLimits(
   max: number;
   canConnect: boolean;
 }> {
-  let user = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       tiktokAccounts: {
@@ -217,37 +217,15 @@ export async function getAccountLimits(
     },
   });
 
-  // If user doesn't exist in database, create them with default values
+  // If user doesn't exist in database, return safe defaults for now
+  // This allows the UI to work even if user record creation fails
   if (!user) {
-    console.log(`Creating user record for ${userId}`);
-    // Use actual email or generate a unique placeholder
-    const email = userEmail || `user-${userId}@tractok.temp`;
-
-    try {
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          email: email,
-          subscriptionTier: "FREE_TRIAL",
-          subscriptionStatus: "TRIALING",
-          maxAccounts: 1,
-          dataRetentionMonths: 6,
-          freeTrialStartDate: new Date(),
-          freeTrialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        },
-        include: {
-          tiktokAccounts: {
-            where: {
-              isActive: true,
-            },
-          },
-        },
-      });
-      console.log(`✅ User record created successfully`);
-    } catch (error) {
-      console.error(`❌ Failed to create user record:`, error);
-      throw error;
-    }
+    console.log(`⚠️ User record not found for ${userId}, returning defaults`);
+    return {
+      current: 0,
+      max: 1,
+      canConnect: true,
+    };
   }
 
   const current = user.tiktokAccounts.length;
