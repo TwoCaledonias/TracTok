@@ -66,6 +66,18 @@ export async function disconnectTikTokAccount(accountId: string) {
  * Get account connection limits for the current user
  */
 export async function getAccountConnectionLimits() {
+  // TEMPORARY: Bypass everything and return hardcoded values for testing
+  console.log("🧪 TEMP: Returning hardcoded limits for testing");
+  return {
+    success: true,
+    limits: {
+      current: 0,
+      max: 1,
+      canConnect: true,
+    },
+  };
+
+  /* Commented out for debugging
   const supabase = await createClient();
   const {
     data: { session },
@@ -88,6 +100,7 @@ export async function getAccountConnectionLimits() {
       error: error instanceof Error ? error.message : "Failed to fetch limits",
     };
   }
+  */
 }
 
 /**
