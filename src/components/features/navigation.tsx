@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { AccountSwitcher } from "@/components/features/account-switcher";
 import { logout } from "@/app/actions/auth";
 import { LayoutDashboard, Package, DollarSign, BarChart3, Settings, LogOut } from "lucide-react";
 
@@ -55,6 +56,12 @@ export function Navigation() {
             );
           })}
         </ul>
+      </div>
+
+      {/* Account Switcher - Phase 2 */}
+      <div className="border-t p-4">
+        <div className="mb-2 text-xs font-medium text-muted-foreground px-2">TikTok Account</div>
+        <AccountSwitcher />
       </div>
 
       {/* Logout Button */}

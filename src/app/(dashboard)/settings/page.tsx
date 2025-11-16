@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConnectedAccounts } from "@/components/features/connected-accounts";
 import { Settings as SettingsIcon } from "lucide-react";
 
 export default async function SettingsPage() {
@@ -17,10 +18,14 @@ export default async function SettingsPage() {
       </div>
 
       <div className="grid gap-6">
+        {/* TikTok Accounts Section - Phase 2 */}
+        <ConnectedAccounts />
+
+        {/* Account Information */}
         <Card>
           <CardHeader>
             <CardTitle>Account Information</CardTitle>
-            <CardDescription>Your account details</CardDescription>
+            <CardDescription>Your TracTok account details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
@@ -29,11 +34,12 @@ export default async function SettingsPage() {
             </div>
             <div>
               <p className="text-sm font-medium">Account ID</p>
-              <p className="text-sm text-muted-foreground">{user?.id}</p>
+              <p className="text-sm text-muted-foreground font-mono text-xs">{user?.id}</p>
             </div>
           </CardContent>
         </Card>
 
+        {/* Additional Settings */}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -44,8 +50,8 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Subscription management, TikTok account connections, and preferences will be available
-              in future phases.
+              Subscription management, preferences, and notifications will be available in future
+              phases.
             </p>
           </CardContent>
         </Card>

@@ -26,6 +26,10 @@ const envSchema = z.object({
   // TikTok OAuth (optional for now, required in Phase 2)
   TIKTOK_CLIENT_KEY: z.string().min(1).optional(),
   TIKTOK_CLIENT_SECRET: z.string().min(1).optional(),
+  TIKTOK_REDIRECT_URI: z.string().url().optional(),
+
+  // Token Encryption
+  TIKTOK_ENCRYPTION_KEY: z.string().min(32).optional(), // Must be at least 32 chars for AES-256
 });
 
 /**
