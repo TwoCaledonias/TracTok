@@ -190,23 +190,9 @@ export async function updateLastSync(accountId: string): Promise<void> {
  * Check if user can connect more accounts based on subscription tier
  */
 export async function canConnectMoreAccounts(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      tiktokAccounts: {
-        where: {
-          isActive: true,
-        },
-      },
-    },
-  });
-
-  if (!user) {
-    return false;
-  }
-
-  const activeAccountCount = user.tiktokAccounts.length;
-  return activeAccountCount < user.maxAccounts;
+  // Use getAccountLimits which handles user creation
+  const limits = await getAccountLimits(userId);
+  return limits.canConnect;
 }
 
 /**
