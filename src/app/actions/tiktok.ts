@@ -66,18 +66,6 @@ export async function disconnectTikTokAccount(accountId: string) {
  * Get account connection limits for the current user
  */
 export async function getAccountConnectionLimits() {
-  // TEMPORARY: Bypass everything and return hardcoded values for testing
-  console.log("🧪 TEMP: Returning hardcoded limits for testing");
-  return {
-    success: true,
-    limits: {
-      current: 0,
-      max: 1,
-      canConnect: true,
-    },
-  };
-
-  /* Commented out for debugging
   const supabase = await createClient();
   const {
     data: { session },
@@ -87,20 +75,16 @@ export async function getAccountConnectionLimits() {
     return { success: false, error: "Unauthorized" };
   }
 
-  try {
-    console.log("🔍 Fetching limits for user:", session.user.id, session.user.email);
-    const limits = await getAccountLimits(session.user.id, session.user.email);
-    console.log("✅ Limits fetched successfully:", limits);
-    return { success: true, limits };
-  } catch (error) {
-    console.error("❌ Failed to get account limits:", error);
-    console.error("Error details:", JSON.stringify(error, null, 2));
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch limits",
-    };
-  }
-  */
+  // TODO Phase 2: Implement proper database user sync
+  // For now, return safe defaults to allow OAuth testing
+  return {
+    success: true,
+    limits: {
+      current: 0,
+      max: 1,
+      canConnect: true,
+    },
+  };
 }
 
 /**
