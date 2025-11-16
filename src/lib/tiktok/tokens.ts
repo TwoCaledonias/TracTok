@@ -217,7 +217,7 @@ export async function getAccountLimits(userId: string): Promise<{
   max: number;
   canConnect: boolean;
 }> {
-  const user = await prisma.user.findUnique({
+  let user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       tiktokAccounts: {
@@ -228,8 +228,28 @@ export async function getAccountLimits(userId: string): Promise<{
     },
   });
 
+  // If user doesn't exist in database, create them with default values
   if (!user) {
-    return { current: 0, max: 0, canConnect: false };
+    console.log(`Creating user record for ${userId}`);
+    user = await prisma.user.create({
+      data: {
+        id: userId,
+        email: "user@example.com", // Will be updated on next login
+        subscriptionTier: "FREE_TRIAL",
+        subscriptionStatus: "TRIALING",
+        maxAccounts: 1,
+        dataRetentionMonths: 6,
+        freeTrialStartDate: new Date(),
+        freeTrialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+      include: {
+        tiktokAccounts: {
+          where: {
+            isActive: true,
+          },
+        },
+      },
+    });
   }
 
   const current = user.tiktokAccounts.length;
